@@ -1,34 +1,42 @@
 import {
   ApplicationCommandOptionType,
-  CommandInteraction
+  CommandInteraction,
+  Locale
 } from 'discord.js'
 import { Discord, Slash, SlashOption } from 'discordx'
 import { Failure, Result } from '../types/result.js'
 import silent from '../utils/silent.js'
 import { remove } from '../db.js'
+import t from '../utils/t.js'
 
-const message = (result: Result<number>): string => {
+const message = (result: Result<number>, locale: Locale): string => {
   if (result.type === 'failure') {
     const error = result.error
 
     if (error) {
-      return `❗ Error occurred: ${error}`
+      return '❗ ' + t('errors.specific', locale) + error
     } else {
-      return '❗ Unknown error occurred'
+      return '❗ ' + t('errors.unknown', locale)
     }
   } else if (result.type === 'success' && result.value === 0) {
-    return '🟰 Not deleted'
+    return '🟰 ' + t('delete.not_performed', locale)
   } else {
-    return '✅ Successfully deleted'
+    return '✅ ' + t('delete.performed', locale)
   }
 }
 
 @Discord()
 export class ActDel {
-  @Slash({ description: 'Delete activity', name: 'act-del' })
+  @Slash({
+    description: 'Delete existing activity',
+    name: 'act-del',
+    descriptionLocalizations: {
+      "ru": t('delete.gist', Locale.Russian)
+    }
+  })
   async handle(
     @SlashOption({
-      description: 'id',
+      description: 'ID',
       name: 'id',
       required: true,
       type: ApplicationCommandOptionType.String
@@ -54,7 +62,7 @@ export class ActDel {
       }
     }
 
-    await interaction.reply(silent({ content: message(await result()) }))
+    await interaction.reply(silent({ content: message(await result(), interaction.locale) }))
 
     return
   }

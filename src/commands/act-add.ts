@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   CommandInteraction,
+  Locale,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
@@ -11,52 +12,61 @@ import { createActivity } from '../types/activity.js'
 import { Result } from '../types/result.js'
 import silent from '../utils/silent.js'
 import { insert } from '../db.js'
+import t from '../utils/t.js'
 
-const message = (result: Result<void>): string => {
+const message = (result: Result<void>, locale: Locale): string => {
   if (result.type === 'failure') {
     const error = result.error
 
     if (error && error.includes('unique constraint')) {
-      return '❗ Entry already exists'
+      return '❗ ' + t('errors.already_exists', locale)
     } else if (error) {
-      return `❗ Error occurred: ${error}`
+      return '❗ ' + t('errors.specific', locale) + error
     } else {
-      return '❗ Unknown error occurred'
+      return '❗ ' + + t('errors.unknown', locale)
     }
   } else {
-    return '✅ Activity submitted'
+    return '✅ ' + t('add.success', locale)
   }
 }
 
 @Discord()
 export class ActAdd {
-  @Slash({ description: 'Add new activity preference', name: 'act-add' })
+  @Slash({
+    description: 'Add new activity preference',
+    name: 'act-add',
+    descriptionLocalizations: {
+      "ru": t('add.gist', Locale.Russian)
+    }
+  })
   async handle(interaction: CommandInteraction): Promise<void> {
+    const locale = interaction.locale
+
     const modal = new ModalBuilder()
-      .setTitle('New activity')
+      .setTitle(t('add.modal_name', locale))
       .setCustomId('submit')
 
     const title = new TextInputBuilder()
       .setCustomId('title')
-      .setLabel('activity')
+      .setLabel(t('add.title', locale))
       .setStyle(TextInputStyle.Short)
-      .setPlaceholder('Be precise')
+      .setPlaceholder(t('add.title_placeholder', locale))
       .setRequired(true)
       .setMaxLength(100)
       .setMinLength(3)
 
     const url = new TextInputBuilder()
       .setCustomId('url')
-      .setLabel('link')
+      .setLabel(t('add.link', locale))
       .setStyle(TextInputStyle.Short)
-      .setPlaceholder('Link')
+      .setPlaceholder(t('add.link_placeholder', locale))
       .setRequired(false)
 
     const description = new TextInputBuilder()
       .setCustomId('description')
-      .setLabel('description')
+      .setLabel(t('add.description', locale))
       .setStyle(TextInputStyle.Paragraph)
-      .setPlaceholder('Your rank in game, convenient hours, etc')
+      .setPlaceholder(t('add.description_placeholder', locale))
       .setRequired(true)
       .setMaxLength(1000)
       .setMinLength(10)
@@ -68,6 +78,8 @@ export class ActAdd {
     )
 
     await interaction.showModal(modal)
+
+    return
   }
 
   @ModalComponent()
@@ -87,7 +99,7 @@ export class ActAdd {
         )
       )
 
-    await interaction.reply(silent({ content: message(result) }))
+    await interaction.reply(silent({ content: message(result, interaction.locale) }))
     return
   }
 }

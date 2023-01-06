@@ -4,6 +4,7 @@ import {
   EmbedBuilder,
   GuildMember,
   italic,
+  Locale,
   User,
   UserManager,
   userMention
@@ -15,65 +16,82 @@ import removeDuplicates from '../utils/removeDuplicates.js'
 import resolveIds from '../utils/usersFromIds.js'
 import silent from '../utils/silent.js'
 import { find } from '../db.js'
+import t from '../utils/t.js'
 
-const presentUsername = (users: User[], id: string) => {
+const presentUsername = (users: User[], id: string, locale: Locale) => {
   const mbUser = users.find(u => u.id.toString() === id)
 
   if (mbUser) {
     return userMention(mbUser.id)
   } else {
-    return 'Unknown user'
+    return t('find.unknown_user', locale)
   }
 }
 
-const presentActivity = (act: Activity, userName: string): string => {
+const presentActivity = (act: Activity, userName: string, locale: Locale): string => {
   const presentTitle = (act: Activity): string => {
     const t = italic(act.title)
     const l = act.link
 
-    return `${act._id.substring(0, 8)} | ` + (l ? `[${t}](${l})` : t)
+    return (l ? `[${t}](${l})` : t) + ' | ' + act._id.substring(0, 8)
   }
 
-  return `${userName} suggests ${presentTitle(act)} \n ${act.description} \n`
+  return `${userName} ${t('find.suggests', locale)} ${presentTitle(act)} \n ${act.description} \n`
 }
 
-async function embed(result: Result<Activity[]>, manager: UserManager): Promise<EmbedBuilder> {
-  const embed = new EmbedBuilder().setTitle('Results')
+async function embed(
+  result: Result<Activity[]>,
+  manager: UserManager,
+  locale: Locale
+): Promise<EmbedBuilder> {
+  const embed = new EmbedBuilder().setTitle(t('find.results', locale))
 
   if (result.type === 'success' && result.value) {
     if (result.value.length > 0) {
       const users =
         await resolveIds(removeDuplicates(result.value.map(act => act.userId)), manager)
       const entries = result.value.map((entry, i) =>
-        `${i + 1}. ` + presentActivity(entry, presentUsername(users, entry.userId))
+        `${i + 1}. ` + presentActivity(entry, presentUsername(users, entry.userId, locale), locale)
       )
 
       return embed.setDescription(entries.join('\n'))
     } else {
-      return embed.setDescription('No entries found')
+      return embed.setDescription(t('find.nothing_found', locale))
     }
   } else {
     if (result.type === 'failure' && result.error) {
-      return embed.setDescription(`❗ Error occurred: ${result.error}`)
+      return embed.setDescription('❗ ' + t('errors.specific', locale) + result.error)
     } else {
-      return embed.setDescription('❗ Unknown error occurred')
+      return embed.setDescription('❗ ' + t('errors.unknown', locale))
     }
   }
 }
 
 @Discord()
 export class ActFind {
-  @Slash({ description: 'Find existing activities', name: 'act-find' })
+  @Slash({
+    description: 'Find existing activities',
+    name: 'act-find',
+    descriptionLocalizations: {
+      "ru": t('find.gist', Locale.Russian)
+    }
+  })
   async handle(
     @SlashOption({
-      description: 'user',
+      description: 'User',
       name: 'user',
+      descriptionLocalizations: {
+        "ru": t('find.param_user', Locale.Russian)
+      },
       required: false,
       type: ApplicationCommandOptionType.User,
     })
     @SlashOption({
-      description: 'page',
+      description: 'Page',
       name: 'page',
+      descriptionLocalizations: {
+        "ru": t('find.param_page', Locale.Russian)
+      },
       required: false,
       type: ApplicationCommandOptionType.Integer,
     })
@@ -83,7 +101,11 @@ export class ActFind {
   ): Promise<void> {
     const result = await find(user, interaction.guild, page)
 
-    await interaction.reply(silent({ embeds: [await embed(result, interaction.client.users)] }))
+    await interaction.reply(
+      silent({
+        embeds: [await embed(result, interaction.client.users, interaction.locale)]
+      })
+    )
 
     return
   }

@@ -33,7 +33,7 @@ async function run() {
   if (process.env.BOT_TOKEN) {
     await bot.login(process.env.BOT_TOKEN)
 
-    bot.user?.setActivity('activities', { type: ActivityType.Watching })
+    bot.user?.setActivity('your activities', { type: ActivityType.Watching })
   } else {
     throw Error('Could not find BOT_TOKEN')
   }

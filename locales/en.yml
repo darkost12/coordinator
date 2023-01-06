@@ -1,0 +1,28 @@
+errors:
+  already_exists: Entry already exists
+  specific: 'Error occurred: '
+  unknown: Unknown error occurred
+add:
+  description: Description
+  description_placeholder: >-
+    Any additional info: your rank or experience in game,
+    convenient hours to meet or talk...
+  link: Link
+  link_placeholder: 'https://google.com'
+  modal_name: New activity
+  success: Entry was created
+  title: Title
+  title_placeholder: Be precise
+delete:
+  not_performed: Not deleted
+  performed: Deleted
+find:
+  nothing_found: Not found
+  results: Results
+  suggests: suggests
+  unknown_user: Unknown user
+shout:
+  gathers: ' gathers people for '
+  nothing_found: >-
+    No users with this activity registered were found and
+    no additional message was provided

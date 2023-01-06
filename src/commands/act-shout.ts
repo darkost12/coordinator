@@ -1,6 +1,7 @@
 import {
   ApplicationCommandOptionType,
   CommandInteraction,
+  Locale,
   UserManager,
   userMention
 } from 'discord.js'
@@ -11,13 +12,15 @@ import removeDuplicates from '../utils/removeDuplicates.js'
 import resolveIds from '../utils/usersFromIds.js'
 import silent from '../utils/silent.js'
 import { byTitle } from '../db.js'
+import t from '../utils/t.js'
 
 async function message(
   result: Result<Activity[]>,
   activityTitle: string,
   userText: string | undefined,
   userId: string,
-  manager: UserManager
+  manager: UserManager,
+  locale: Locale
 ): Promise<[string, boolean]> {
   if (result.type === 'success' && result.value) {
     const users =
@@ -31,34 +34,46 @@ async function message(
     const mentions = users.map(u => userMention(u.id))
 
     if (mentions.length > 0 || userText) {
-      const base = userMention(userId) + ' gathers people for ' + activityTitle
+      const base = userMention(userId) + t('shout.gathers', locale) + activityTitle
 
-      return [`${base} \n ${userText || ''} \n ${mentions.join(' ')} \n`, false]
+      return [`${base} \n${userText || ''} \n ${mentions.join(' ')} \n`, false]
     } else {
-      return [`❗ No users with this activity or no message provided`, true]
+      return ['❗ ' + t('shout.nothing_found', locale), true]
     }
   } else {
     if (result.type === 'failure' && result.error) {
-      return [`❗ Error occurred: ${result.error}`, true]
+      return ['❗ ' + t('errors.specific', locale) + result.error, true]
     } else {
-      return ['❗ Unknown error occurred', true]
+      return ['❗ ' + t('errors.unknown', locale), true]
     }
   }
 }
 
 @Discord()
 export class ActShout {
-  @Slash({ description: 'Notify people with same interests', name: 'act-shout' })
+  @Slash({
+    description: 'State your readiness to do something and call people to participate',
+    name: 'act-shout',
+    descriptionLocalizations: {
+      "ru": t('shout.gist', Locale.Russian)
+    },
+  })
   async handle(
     @SlashOption({
-      description: 'title',
+      description: 'Title',
       name: 'title',
+      descriptionLocalizations: {
+        "ru": t('shout.param_title', Locale.Russian)
+      },
       required: true,
       type: ApplicationCommandOptionType.String
     })
     @SlashOption({
-      description: 'additional text',
+      description: 'Additional message',
       name: 'text',
+      descriptionLocalizations: {
+        "ru": t('find.param_text', Locale.Russian)
+      },
       required: false,
       type: ApplicationCommandOptionType.String
     })
@@ -82,7 +97,8 @@ export class ActShout {
         title,
         text,
         interaction.user.id,
-        interaction.client.users
+        interaction.client.users,
+        interaction.locale
       )
 
     if (silently) {
