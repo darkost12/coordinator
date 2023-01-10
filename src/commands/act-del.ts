@@ -31,7 +31,7 @@ export class ActDel {
     description: 'Delete existing activity',
     name: 'act-del',
     descriptionLocalizations: {
-      "ru": t('delete.gist', Locale.Russian)
+      'ru': t('delete.gist', Locale.Russian)
     }
   })
   async handle(

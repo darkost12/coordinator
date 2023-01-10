@@ -36,7 +36,7 @@ export class ActAdd {
     description: 'Add new activity preference',
     name: 'act-add',
     descriptionLocalizations: {
-      "ru": t('add.gist', Locale.Russian)
+      'ru': t('add.gist', Locale.Russian)
     }
   })
   async handle(interaction: CommandInteraction): Promise<void> {

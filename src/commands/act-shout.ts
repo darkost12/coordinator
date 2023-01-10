@@ -55,7 +55,7 @@ export class ActShout {
     description: 'State your readiness to do something and call people to participate',
     name: 'act-shout',
     descriptionLocalizations: {
-      "ru": t('shout.gist', Locale.Russian)
+      'ru': t('shout.gist', Locale.Russian)
     },
   })
   async handle(
@@ -63,7 +63,7 @@ export class ActShout {
       description: 'Title',
       name: 'title',
       descriptionLocalizations: {
-        "ru": t('shout.param_title', Locale.Russian)
+        'ru': t('shout.param_title', Locale.Russian)
       },
       required: true,
       type: ApplicationCommandOptionType.String
@@ -72,7 +72,7 @@ export class ActShout {
       description: 'Additional message',
       name: 'text',
       descriptionLocalizations: {
-        "ru": t('find.param_text', Locale.Russian)
+        'ru': t('find.param_text', Locale.Russian)
       },
       required: false,
       type: ApplicationCommandOptionType.String

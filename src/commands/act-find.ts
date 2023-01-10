@@ -73,7 +73,7 @@ export class ActFind {
     description: 'Find existing activities',
     name: 'act-find',
     descriptionLocalizations: {
-      "ru": t('find.gist', Locale.Russian)
+      'ru': t('find.gist', Locale.Russian)
     }
   })
   async handle(
@@ -81,7 +81,7 @@ export class ActFind {
       description: 'User',
       name: 'user',
       descriptionLocalizations: {
-        "ru": t('find.param_user', Locale.Russian)
+        'ru': t('find.param_user', Locale.Russian)
       },
       required: false,
       type: ApplicationCommandOptionType.User,
@@ -90,7 +90,7 @@ export class ActFind {
       description: 'Page',
       name: 'page',
       descriptionLocalizations: {
-        "ru": t('find.param_page', Locale.Russian)
+        'ru': t('find.param_page', Locale.Russian)
       },
       required: false,
       type: ApplicationCommandOptionType.Integer,

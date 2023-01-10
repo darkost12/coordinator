@@ -25,6 +25,13 @@ bot.on('interactionCreate', (interaction: Interaction) => {
   bot.executeInteraction(interaction)
 })
 
+bot.rest.on('restDebug', message => {
+  if (message.includes('429 rate limit')) {
+    console.log('Rate limit hit at' + (new Date()).toTimeString())
+    // Your handler
+  }
+})
+
 async function run() {
   envConfig()
   ensureIndexes()
