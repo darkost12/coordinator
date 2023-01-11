@@ -21,6 +21,7 @@ delete:
 find:
   gist: Найти активности по параметрам
   nothing_found: Не найдено
+  param_activity: Название активности
   param_page: Страница
   param_user: Пользователь
   results: Результаты

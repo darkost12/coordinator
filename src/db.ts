@@ -15,8 +15,10 @@ const datastore = () => {
 export async function ensureIndexes() {
   const db = datastore()
 
-  const titleIndex = () => db.ensureIndexAsync({ fieldName: 'title', unique: false, sparse: false })
-  const userIndex = () => db.ensureIndexAsync({ fieldName: 'userId', unique: false, sparse: false })
+  const titleIndex = () =>
+    db.ensureIndexAsync({ fieldName: 'title', unique: false, sparse: false })
+  const userIndex = () =>
+    db.ensureIndexAsync({ fieldName: 'userId', unique: false, sparse: false })
 
   return await Promise.all([titleIndex(), userIndex()])
 }
@@ -34,18 +36,26 @@ export async function insert(act: Activity): Promise<Result<void>> {
 }
 
 export async function find(
+  activity: string | undefined,
   user: GuildMember | undefined,
   guild: Guild | null,
   page: number | undefined
 ): Promise<Result<Activity[]>> {
   try {
     const baseParams = { visible: true }
+    const optionalActivityParam =
+      activity ? { title: { $regex: new RegExp('.*' + activity + '.*', 'i') } } : {}
     const optionalUserParam = user ? { userId: user?.id } : {}
     const optionalGuildParam = guild ? { guildId: guild?.id } : {}
 
     const docs =
       await datastore()
-        .findAsync({ ...baseParams, ...optionalGuildParam, ...optionalUserParam })
+        .findAsync({
+          ...baseParams,
+          ...optionalActivityParam,
+          ...optionalUserParam,
+          ...optionalGuildParam
+        })
         .skip((page && page > 0 ? page - 1 : 0) * PageSize)
         .limit(PageSize)
 
@@ -88,7 +98,7 @@ export async function remove(
   admin: boolean
 ): Promise<Result<number>> {
   try {
-    const baseParams = { _id: new RegExp('^' + id + '.{56}$'), guildId: guildId }
+    const baseParams = { _id: { $regex: new RegExp('^' + id + '.{56}$') }, guildId: guildId }
     const optionalUserParam = admin ? {} : { userId: userId }
 
     const removedItems =

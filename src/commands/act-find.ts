@@ -78,6 +78,15 @@ export class ActFind {
   })
   async handle(
     @SlashOption({
+      description: 'Activity name',
+      name: 'activity',
+      descriptionLocalizations: {
+        ru: t('find.param_activity', Locale.Russian),
+      },
+      required: false,
+      type: ApplicationCommandOptionType.String,
+    })
+    @SlashOption({
       description: 'User',
       name: 'user',
       descriptionLocalizations: {
@@ -95,11 +104,12 @@ export class ActFind {
       required: false,
       type: ApplicationCommandOptionType.Integer,
     })
+    activity: string | undefined,
     user: GuildMember | undefined,
     page: number | undefined,
     interaction: CommandInteraction
   ): Promise<void> {
-    const result = await find(user, interaction.guild, page)
+    const result = await find(activity, user, interaction.guild, page)
 
     await interaction.reply(
       silent({
