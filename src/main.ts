@@ -33,7 +33,7 @@ bot.rest.on('restDebug', message => {
 })
 
 async function run() {
-  envConfig()
+  envConfig({ path: dirname(import.meta.url) + '/../shared/.env' })
   ensureIndexes()
 
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`)
