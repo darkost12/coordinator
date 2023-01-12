@@ -7,7 +7,7 @@ import type { Guild, GuildMember } from 'discord.js'
 const PageSize = 10
 
 const datastore = () => {
-  const db = new Datastore({ filename: dirname(import.meta.url) + '/../.db', autoload: true })
+  const db = new Datastore({ filename: process.env.DB_FILE, autoload: true })
 
   return db
 }

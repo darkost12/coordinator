@@ -38,14 +38,14 @@ async function run() {
 
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`)
 
-  if (process.env.BOT_TOKEN) {
+  if (process.env.BOT_TOKEN && process.env.DB_FILE) {
     await bot.login(process.env.BOT_TOKEN)
 
     bot.user?.setActivity('your activities', { type: ActivityType.Watching })
 
     createServer((_, res) => res.end('Bot is alive!')).listen(3000)
   } else {
-    throw Error('Could not find BOT_TOKEN')
+    throw Error('Could not find BOT_TOKEN or DB_FILE')
   }
 }
 
